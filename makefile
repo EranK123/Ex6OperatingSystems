@@ -10,10 +10,10 @@ main1.o: main1.cpp
 	$(COMP) -c $(CFLAGS) main1.cpp -lpthread
 
 guard: guard.o
-	$(COMP) $(CFLAGS) guard.o -o guard
+	$(COMP) $(CFLAGS) guard.o -o guard -lpthread
 
 guard.o: guard.cpp
-	$(COMP) -c $(CFLAGS) guard.cpp
+	$(COMP) -c $(CFLAGS) guard.cpp -lpthread
 
 singelton: singelton.o
 	$(COMP) $(CFLAGS) singelton.o -o singelton

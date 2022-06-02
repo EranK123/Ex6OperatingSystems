@@ -121,7 +121,6 @@ void* printElem2(void *ptr){
 
 int main()
 {
-
 	Queue q;
     q.createQ();
 	int x = 5;
@@ -129,5 +128,7 @@ int main()
 
 	q.enQ(&x);
 	q.enQ(&y);
-	newAO(q, &printElem1, &printElem2);
+	void *f = q.deQ();
+	cout << *(int*) f << endl;
+	// newAO(q, &printElem1, &printElem2);
 }
