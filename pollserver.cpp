@@ -17,25 +17,23 @@ int listener;
 #define PORT "9034"   // Port we're listening on
 int fd_count;
 struct pollfd *pfds;
+
 void * thrF(void *elem){
     char buffer[2048];
+    memset(buffer, 0, sizeof(buffer));
+	strcpy(buffer, "Hello Server");
     pevent event_ = &((pevent)elem)[0];
     int fd = event_->fd;
-    while(true){
-        int amount = recv(fd, buffer, sizeof(buffer), 0);
-        if(amount <= 0){
-            close(fd);
-        }
         for(int i = 0; i <= fd_count; i++){
             int fdOfClient = pfds[i].fd;
-            if(fdOfClient != listener){
-                if(fdOfClient != fd){
-                    send(fdOfClient, buffer, amount, 0);
-                }
+            cout << fdOfClient << endl;
+            if(fdOfClient != fd){
+                send(fd, buffer, sizeof(buffer), 0); //send the message back
             }
-        }
+        
         bzero(buffer, 2048);
     }
+    return nullptr;
 }
 
 // Get sockaddr, IPv4 or IPv6:
@@ -127,7 +125,7 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
 // Main
 int main(void)
 {
-    int listener;     // Listening socket descriptor
+        // Listening socket descriptor
 
     int newfd;        // Newly accept()ed socket descriptor
     struct sockaddr_storage remoteaddr; // Client address
@@ -141,7 +139,7 @@ int main(void)
     // (We'll realloc as necessary)
     int fd_count = 0;
     int fd_size = 5;
-    struct pollfd *pfds = (struct pollfd*)malloc(sizeof *pfds * fd_size);
+    pfds = (pollfd*)malloc(sizeof *pfds * fd_size);
 
     // Set up and get a listening socket
     listener = get_listener_socket();
@@ -191,9 +189,9 @@ int main(void)
                                 get_in_addr((struct sockaddr*)&remoteaddr),
                                 remoteIP, INET6_ADDRSTRLEN),
                             newfd);
-                            //  preactor r = (preactor) newReactor();  
-                            // struct Reactor *r = (preactor)newReactor();
-                            // installHandler(r, &thrF, newfd);
+                             preactor r = (preactor) newReactor();  
+                             cout << 196 << endl;
+                            installHandler(r, &thrF, newfd);
                     }
                 } else {
                     // If not the listener, we're just a regular client

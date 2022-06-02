@@ -7,9 +7,9 @@ using namespace std;
 
 
 typedef struct Reactor{
-    int fd;
     pthread_t thr;
     void* (*pointerfunc)(void*);
+    int fd;
 }*preactor, reactor;
 
 typedef struct event{
@@ -22,13 +22,13 @@ preactor newReactor(){
     return react;
 }
 
-void installHandler(preactor react, void *(*pointerfunc)(void*), int fd){
+void installHandler(preactor react, void *(pointerfunc)(void*), int fd){
     react->fd = fd;
     react->pointerfunc = pointerfunc;
-    pevent r = (pevent)malloc(sizeof(event));
-    r->fd = fd;
-    r->reactor = react;
-    pthread_create(&react->thr, NULL, pointerfunc, r);
+    pevent eve = (pevent)malloc(sizeof(event));
+    eve->fd = fd;
+    eve->reactor = react;
+    pthread_create(&react->thr, NULL, pointerfunc, eve);
 }
 
 void RemoveHandler(preactor r, int fd){
