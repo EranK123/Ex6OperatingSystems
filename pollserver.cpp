@@ -28,10 +28,9 @@ void * thrF(void *elem){
             int fdOfClient = pfds[i].fd;
             cout << fdOfClient << endl;
             if(fdOfClient != fd){
-                send(fd, buffer, sizeof(buffer), 0); //send the message back
+                send(fd, buffer, sizeof(buffer), 0); //send the message 
             }
-        
-        bzero(buffer, 2048);
+
     }
     return nullptr;
 }
