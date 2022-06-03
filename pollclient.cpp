@@ -44,5 +44,5 @@ int main()
 	read(sockfd, buffer, sizeof(buffer));
 	puts(buffer);
 	
-	close(sockfd);
+	// close(sockfd);
 }

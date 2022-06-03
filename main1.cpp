@@ -2,6 +2,17 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/wait.h>
+#include <signal.h>
 using namespace std;
 
 //-------------------Q1-------------//
@@ -40,13 +51,15 @@ struct Queue {
 
 		if (rear == NULL) {
 			front = rear = temp;
+			pthread_cond_signal(&cond);
+			pthread_mutex_unlock(&lock);
 			return;
 		}
 
 		rear->next = temp;
 		rear = temp;
-        pthread_cond_signal(&cond);
-        pthread_mutex_unlock(&lock);
+		pthread_mutex_unlock(&lock);
+        
 	}
 
 
@@ -71,18 +84,10 @@ struct Queue {
 	}
 
     void destroyQ(){
-        // pthread_mutex_lock(&lock);
-        if(front == NULL){
-            return;
-        }
-        QNode *temp = front;
-        while(temp){
-            front = front->next;
-            delete(temp);
-            temp = front;
-        }
-        front = NULL;
-        // pthread_mutex_unlock(&lock);
+        while(this->front != nullptr){
+			deQ();
+		}
+		delete this;
     }
 };
 
@@ -117,6 +122,9 @@ void* printElem2(void *ptr){
 	pthread_join(active_object.pth, NULL);
 	cout << "Func 2 Elem is at: " << &ptr << endl;
 }
+
+
+//-------------------Q3-------------//
 
 
 int main()
