@@ -26,11 +26,11 @@ void * thrF(void *elem){
     int fd = event_->fd;
         for(int i = 0; i <= fd_count; i++){
             int fdOfClient = pfds[i].fd;
-            cout << fdOfClient << endl;
             if(fdOfClient != fd){
-                send(fd, buffer, sizeof(buffer), 0); //send the message 
+                send(fd, buffer, sizeof(buffer), 0); //send the message back
             }
-
+        
+        bzero(buffer, 2048);
     }
     return nullptr;
 }
@@ -189,7 +189,6 @@ int main(void)
                                 remoteIP, INET6_ADDRSTRLEN),
                             newfd);
                              preactor r = (preactor) newReactor();  
-                             cout << 196 << endl;
                             installHandler(r, &thrF, newfd);
                     }
                 } else {
