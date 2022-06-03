@@ -15,7 +15,7 @@ class Guard {      // The class
     ~Guard() { pthread_mutex_unlock(this->lock); } 
 };
 
-int c;
+int c = 0;
 void *print_message_function( void *ptr ){
     Guard g(&lock2);
     for (int i = 0; i < 200; i++)
