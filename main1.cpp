@@ -13,12 +13,13 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#define PORT 5002 
 using namespace std;
 
 //-------------------Q1-------------//
 struct QNode {
 	void* data;
-	QNode* next;
+	struct QNode* next;
 	int fd;
 	QNode(void* d)
 	{
@@ -34,13 +35,12 @@ struct QNode {
 pthread_mutex_t lock_;
 pthread_cond_t cond_;
 struct Queue {
-   
 	QNode *front, *rear;
 
 };
 Queue* createQ(){
         // pthread_mutex_lock(&lock);
-		Queue *queue = (Queue *)(malloc)(sizeof(struct Queue));
+		Queue *queue = (Queue *)(malloc(sizeof(struct Queue)));
 		queue->rear = nullptr;
 		queue->front = nullptr;
         // pthread_mutex_unlock(&lock);
@@ -111,12 +111,12 @@ typedef struct AO{
 }activeo, *pactiveo;
 
 
-void* newAO(Queue *q, void* (*func1)(void*), void* (*func2)(void*)){
+void newAO(Queue *q, void* (*func1)(void*), void* (*func2)(void*)){
 	// pactiveo new_ao = (pactiveo)(malloc(sizeof(activeo))); 
-	QNode* x = (QNode *)deQ(q);
+	struct QNode* x = (struct QNode *)deQ(q);
 	func1(x);
 	func2(x);
-	return nullptr;
+	// return nullptr;
 }
 
 void destroyAO(AO *ao){
@@ -137,9 +137,10 @@ void* printElem2(void *ptr){
 }
 
 void* newAO2(void *e){
+	cout << 142 << endl;
 	pactiveo o = (pactiveo)e;
 	newAO(o->q, o->f1, o->f2);
-	return nullptr;
+	// return nullptr;
 }
 
 //-------------------Q3-------------//
@@ -177,6 +178,7 @@ void* ceacar(void *e){
 }
 
 void *lower_upper(void* e){
+	cout << 181 << endl;
 	QNode *node = (QNode *)e;
 	int length = strlen((char*)node->data);
 	char *s = (char*)(malloc(sizeof(node->data)));
@@ -188,6 +190,7 @@ void *lower_upper(void* e){
 			s[i] -= 32;
 		}
 	}
+	cout << 191 << endl;
 	node->data = s;
 	return nullptr;
 }
@@ -197,7 +200,6 @@ void* sendMessage(void *e){
 	QNode *node = (QNode *)(e);
 	cout << (char*)node->data << endl;
 	send(node->fd, node->data, strlen((char*)node->data), 0);
-	sleep(1);
 	return nullptr;
 }
 
@@ -205,11 +207,10 @@ void* run(void *e){
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in serverAddress;
     memset(&serverAddress, 0, sizeof(serverAddress));
+	 serverAddress.sin_port = htons(PORT);
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(5555);
     if (bind(sockfd, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) == -1){
-        printf("Bind failed\n");
-        close(sockfd);
+        printf("Bind failed");
         return nullptr;
     }
     listen(sockfd, 4);
@@ -228,20 +229,20 @@ void* run(void *e){
 
 void *func1(void *arg)
 {
-    QNode *n = ( QNode *)arg;
+    QNode *n = (QNode *)arg;
     int l = strlen((char*)n->data);
-    char str[l];
-    strcpy(str, (char*)n->data);
-    enQ(ao2q, str, n->fd);
+    char t[l];
+    strcpy(t, (char*)n->data);
+    enQ(ao2q, t, n->fd);
 }
 
 void *func2(void *arg)
-{
-    QNode *n = (QNode *)arg;
+{	
+    struct QNode *n = (struct QNode *)arg;
     int l = strlen((char*)n->data);
-    char str[l];
-    strcpy(str, (char*)n->data);
-    enQ(ao3q, str, n->fd);
+    char t[l];
+    strcpy(t, (char*)n->data);
+    enQ(ao3q, t, n->fd);
 }
 
 typedef struct activeAos{
@@ -292,13 +293,15 @@ int main()
         cout << (char *)(n->data) << endl;
         n = n->next;
     }
-	
+
 	pthread_create(&fora1, NULL, newAO2, pnum->active1);
 	sleep(5);
 	pthread_create(&fora2, NULL, newAO2, pnum->active2);
 	sleep(6);
 	pthread_create(&fora3, NULL, newAO2, pnum->active3);
-	sleep(3);
+
+			
+
 	pnum->active1->pth = fora1;
     pnum->active2->pth = fora2;
     pnum->active3->pth = fora3;
@@ -307,4 +310,5 @@ int main()
         cout << (char *)(n1->data) << endl;
         n1 = n1->next;
     }
+
 }

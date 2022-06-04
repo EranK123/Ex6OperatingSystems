@@ -5,10 +5,10 @@ all: main1 guard singelton pollserver reactor pollclient activeOclient
 
 
 activeOclient: activeOclient.o
-	$(COMP) $(CFLAGS) activeOclient.o -o activeOclient -lpthread
+	$(COMP) $(CFLAGS) activeOclient.o -o activeOclient 
 
 activeOclient.o: activeOclient.cpp
-	$(COMP) -c $(CFLAGS) activeOclient.cpp -lpthread
+	$(COMP) -c $(CFLAGS) activeOclient.cpp 
 
 main1: main1.o
 	$(COMP) $(CFLAGS) main1.o -o main1 -lpthread

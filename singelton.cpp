@@ -36,8 +36,10 @@ class Singelton{
 
 int main()
 {
-    Singelton<int>* s = Singelton<int>::Instance();
-    void* p = mmap (s, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
-    cout<< s << endl;
-    cout << p;
+    Singelton<int>* s1 = Singelton<int>::Instance();
+    Singelton<int>* s2 = Singelton<int>::Instance();
+    void* p1 = mmap (s1, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+    void* p2 = mmap (s2, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
+    cout<< s1 << endl;
+    cout<< s2 << endl;
 }
