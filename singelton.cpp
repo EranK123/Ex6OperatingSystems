@@ -36,8 +36,8 @@ class Singelton{
 
 int main()
 {
-    Singelton<int>* s=Singelton<int>::Instance();
+    Singelton<int>* s = Singelton<int>::Instance();
     void* p = mmap (s, 1, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0 );
-    cout<< s <<endl;
+    cout<< s << endl;
     cout << p;
 }

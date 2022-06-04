@@ -1,7 +1,14 @@
 CFLAGS= -Wall
 COMP = clang++
 
-all: main1 guard singelton pollserver reactor pollclient
+all: main1 guard singelton pollserver reactor pollclient activeOclient
+
+
+activeOclient: activeOclient.o
+	$(COMP) $(CFLAGS) activeOclient.o -o activeOclient -lpthread
+
+activeOclient.o: activeOclient.cpp
+	$(COMP) -c $(CFLAGS) activeOclient.cpp -lpthread
 
 main1: main1.o
 	$(COMP) $(CFLAGS) main1.o -o main1 -lpthread
@@ -41,4 +48,4 @@ reactor: reactor.cpp
 .PHONY: clean all
 
 clean:
-	rm *.o main1 guard singelton pollserver pollclient
+	rm *.o main1 guard singelton pollserver pollclient activeOclient
