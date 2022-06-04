@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-#define PORT 5002 
+#define PORT 5003
 using namespace std;
 
 //-------------------Q1-------------//
@@ -113,7 +113,7 @@ typedef struct AO{
 
 void newAO(Queue *q, void* (*func1)(void*), void* (*func2)(void*)){
 	// pactiveo new_ao = (pactiveo)(malloc(sizeof(activeo))); 
-	struct QNode* x = (struct QNode *)deQ(q);
+	QNode* x = (QNode *)deQ(q);
 	func1(x);
 	func2(x);
 	// return nullptr;
@@ -160,6 +160,7 @@ void* getinput(void *arg){
 }
 
 void* ceacar(void *e){
+	cout << "ceacar" << endl;
 	QNode *node = (QNode *)e;
 	int length = strlen((char*)node->data);
 	char *s = (char*)(malloc(sizeof(node->data)));
@@ -178,6 +179,7 @@ void* ceacar(void *e){
 }
 
 void *lower_upper(void* e){
+	cout << "lower_upper" << endl;
 	cout << 181 << endl;
 	QNode *node = (QNode *)e;
 	int length = strlen((char*)node->data);
@@ -229,6 +231,7 @@ void* run(void *e){
 
 void *func1(void *arg)
 {
+	cout << "func1" << endl;
     QNode *n = (QNode *)arg;
     int l = strlen((char*)n->data);
     char t[l];
@@ -238,6 +241,7 @@ void *func1(void *arg)
 
 void *func2(void *arg)
 {	
+	cout << "func2" << endl;
     struct QNode *n = (struct QNode *)arg;
     int l = strlen((char*)n->data);
     char t[l];
@@ -299,16 +303,11 @@ int main()
 	pthread_create(&fora2, NULL, newAO2, pnum->active2);
 	sleep(6);
 	pthread_create(&fora3, NULL, newAO2, pnum->active3);
-
-			
-
-	pnum->active1->pth = fora1;
-    pnum->active2->pth = fora2;
-    pnum->active3->pth = fora3;
-	struct QNode *n1 = ao1q->front;
-    while (n1 != NULL){
-        cout << (char *)(n1->data) << endl;
-        n1 = n1->next;
-    }
+	return 0;
+	// struct QNode *n1 = ao1q->front;
+    // while (n1 != NULL){
+    //     cout << (char *)(n1->data) << endl;
+    //     n1 = n1->next;
+    // }
 
 }
