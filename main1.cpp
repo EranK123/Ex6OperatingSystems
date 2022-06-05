@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-#define PORT 5003
+#define PORT 5009
 using namespace std;
 
 //-------------------Q1-------------//
@@ -112,6 +112,7 @@ typedef struct AO{
 
 
 void newAO(Queue *q, void* (*func1)(void*), void* (*func2)(void*)){
+	cout << "AO created" << endl;
 	// pactiveo new_ao = (pactiveo)(malloc(sizeof(activeo))); 
 	QNode* x = (QNode *)deQ(q);
 	func1(x);
@@ -137,30 +138,30 @@ void* printElem2(void *ptr){
 }
 
 void* newAO2(void *e){
-	cout << 142 << endl;
 	pactiveo o = (pactiveo)e;
 	newAO(o->q, o->f1, o->f2);
-	// return nullptr;
+	return nullptr;
 }
 
 //-------------------Q3-------------//
 char client_message[1024];
 void* getinput(void *arg){
-	// if(ao1q->front == nullptr && ao1q->rear == nullptr){
-	// 	ao1q createQ();
-	// }
+	if(ao1q->front == nullptr && ao1q->rear == nullptr){
+		ao1q = createQ();
+	}
 	int newSocket = *((int *)arg);
+	while(1){
 	recv(newSocket, client_message, sizeof(client_message), 0);
 	client_message[strlen(client_message)] = '\0';
 	char*enq_msg = (char*)(malloc)(strlen(client_message));
 	strcpy(enq_msg, client_message);
 	enQ(ao1q ,enq_msg, newSocket);
+	}
 	memset(client_message, 0, 1024);
 	return nullptr;
 }
 
 void* ceacar(void *e){
-	cout << "ceacar" << endl;
 	QNode *node = (QNode *)e;
 	int length = strlen((char*)node->data);
 	char *s = (char*)(malloc(sizeof(node->data)));
@@ -179,8 +180,6 @@ void* ceacar(void *e){
 }
 
 void *lower_upper(void* e){
-	cout << "lower_upper" << endl;
-	cout << 181 << endl;
 	QNode *node = (QNode *)e;
 	int length = strlen((char*)node->data);
 	char *s = (char*)(malloc(sizeof(node->data)));
@@ -192,15 +191,12 @@ void *lower_upper(void* e){
 			s[i] -= 32;
 		}
 	}
-	cout << 191 << endl;
 	node->data = s;
 	return nullptr;
 }
 
 void* sendMessage(void *e){
-	cout << 196 << endl;
 	QNode *node = (QNode *)(e);
-	cout << (char*)node->data << endl;
 	send(node->fd, node->data, strlen((char*)node->data), 0);
 	return nullptr;
 }
@@ -216,44 +212,17 @@ void* run(void *e){
         return nullptr;
     }
     listen(sockfd, 4);
-    while (1){
-        struct sockaddr_storage taddr;
+	  struct sockaddr_storage taddr;
         socklen_t size_ = sizeof(taddr);
-        int new_fd = accept(sockfd, (struct sockaddr *)&taddr, &size_);
-        if (new_fd != -1)
-        {
+    while (1){
+        int fd = accept(sockfd, (struct sockaddr *)&taddr, &size_);
             pthread_t th;
-            pthread_create(&th, NULL, getinput, &new_fd);
-        }
+            pthread_create(&th, NULL, getinput, &fd);
     }
     return nullptr;
 }
 
-void *func1(void *arg)
-{
-	cout << "func1" << endl;
-    QNode *n = (QNode *)arg;
-    int l = strlen((char*)n->data);
-    char t[l];
-    strcpy(t, (char*)n->data);
-    enQ(ao2q, t, n->fd);
-}
 
-void *func2(void *arg)
-{	
-	cout << "func2" << endl;
-    struct QNode *n = (struct QNode *)arg;
-    int l = strlen((char*)n->data);
-    char t[l];
-    strcpy(t, (char*)n->data);
-    enQ(ao3q, t, n->fd);
-}
-
-typedef struct activeAos{
-	pactiveo active1;
-	pactiveo active2;
-	pactiveo active3;
-}numofaos, *pnumofaos;
 
 int main()
 {	
@@ -273,19 +242,12 @@ int main()
 	a3->f2 = printElem1;
 	a1->f1 = ceacar;
 	a2->f1 = lower_upper;
-	a1->f2 = func1;
-	a2->f2 = func2;
+	a1->f2 = printElem1;
+	a2->f2 = printElem2;
 
 	a3->q = ao3q;
 	a2->q = ao2q;
 	a1->q = ao1q;
-
-	pnumofaos pnum = (pnumofaos)(malloc(sizeof(numofaos)));
-	pnum->active1 = a1;
-	
-	pnum->active3 = a3;
-	pnum->active2 = a2;
-
 	pthread_create(&threadserver, NULL, run, ao1q);
 	sleep(12);
 	if(ao1q == nullptr){
@@ -298,12 +260,12 @@ int main()
         n = n->next;
     }
 
-	pthread_create(&fora1, NULL, newAO2, pnum->active1);
-	sleep(5);
-	pthread_create(&fora2, NULL, newAO2, pnum->active2);
-	sleep(6);
-	pthread_create(&fora3, NULL, newAO2, pnum->active3);
-	return 0;
+	pthread_create(&fora1, NULL, newAO2, a1);
+	pthread_create(&fora2, NULL, newAO2, a2);
+	pthread_create(&fora3, NULL, newAO2, a3);
+
+
+	// return 0;
 	// struct QNode *n1 = ao1q->front;
     // while (n1 != NULL){
     //     cout << (char *)(n1->data) << endl;

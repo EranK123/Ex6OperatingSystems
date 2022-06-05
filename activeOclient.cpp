@@ -13,9 +13,10 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <vector>
 using namespace std;
 
-#define PORT "5003" // the port client will be connecting to 
+#define PORT "5009" // the port client will be connecting to 
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 
@@ -30,11 +31,13 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 int main(int argc, char *argv[])
-{
+{   
+    vector<string> s;
     while (1)
     {    
     string command;
     getline(cin, command);
+    s.push_back(command);
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
@@ -82,7 +85,6 @@ int main(int argc, char *argv[])
     // printf("client: connecting to %s\n", s);
 
     freeaddrinfo(servinfo); // all done with this structure
-
      if(send(sockfd , command.c_str() , strlen(command.c_str()) , 0) < 0)
 		{
 			puts("Send failed");
@@ -90,15 +92,15 @@ int main(int argc, char *argv[])
 		}
 		
 
-    if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-        perror("recv");
-        exit(1);
-    }
+    // if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+    //     perror("recv");
+    //     exit(1);
+    // }
 
-    buf[numbytes] = '\0';
+    // buf[numbytes] = '\0';
 
-      
-    printf("messag back: %s\n", command.c_str());
+
+    printf("message is: %s\n", command.c_str());
     }
     // close(sockfd);
     return 0;
